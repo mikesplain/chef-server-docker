@@ -6,13 +6,10 @@ FROM ubuntu:12.04
 MAINTAINER Mike Splain mike.splain@gmail.com
 
 RUN apt-get update
-RUN apt-get install git curl wget build-essential libxml2-dev libxslt1-dev -y
+RUN apt-get install git curl wget build-essential libxml2-dev libxslt1-dev runit -y
 
-RUN curl -L https://www.opscode.com/chef/install.sh | bash
-RUN mkdir -p /var/chef/cache /root/chef-server
-RUN wget -qO- https://github.com/opscode-cookbooks/chef-server/archive/master.tar.gz | tar xvzC /root/chef-server --strip-components=1
+RUN cd /tmp; wget -q https://opscode-omnibus-packages.s3.amazonaws.com/ubuntu/12.04/x86_64/chef-server_11.0.11-1.ubuntu.12.04_amd64.deb
 
-RUN cd root/chef-server; /opt/chef/embedded/bin/gem install bundler; /opt/chef/embedded/bin/bundle
-RUN cd root/chef-server; /opt/chef/embedded/bin/gem install berkshelf; /opt/chef/embedded/bin/berks vendor /var/chef/cookbooks
+RUN dpkg -i /tmp/chef-server_11.0.11-1.ubuntu.12.04_amd64.deb
 
-RUN chef-solo -o 'recipe[chef-server::default]'
+RUN sudo chef-server-ctl reconfigure
